@@ -1,4 +1,10 @@
 import json, re
+try:
+    import crewai.llms.cache as crew_cache
+    crew_cache.mark_cache_breakpoint = lambda msg: msg
+except Exception:
+    pass
+from crewai import Crew, Process
 from crewai import Crew, Process
 from agents.core_agents import scoper, router, specialist, research_agent, synthesis_agent, reviewer_agent, report_agent
 from tasks.analysis_tasks import scope_task, route_task, research_task, specialist_task, synthesis_task, review_task, final_task
