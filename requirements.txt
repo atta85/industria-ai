@@ -1,5 +1,6 @@
 # Industria-AI. Tested with Python 3.12/3.13 (CrewAI needs Python below 3.14).
 crewai[litellm]>=1.15,<1.16
+litellm>=1.84,<1.106   # 1.106+ needs a newer mcp than CrewAI allows
 streamlit[auth]>=1.50,<2.0
 pandas>=2.2,<3.0
 matplotlib>=3.9,<4.0
