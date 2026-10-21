@@ -795,6 +795,8 @@ def render_final(user, storage):
               "verified")
     if st.session_state.saved_msg:
         st.caption(st.session_state.saved_msg)
+    render_report_body(st.session_state.investigation, st.session_state.confirmed)
+    st.divider()
     c1, c2, c3 = st.columns([1.4, 1, 1])
     c1.download_button("Download PDF report", data=st.session_state.pdf_bytes,
                        file_name=f"industria-ai-report-{report['report_id']}.pdf", mime="application/pdf",
@@ -805,7 +807,6 @@ def render_final(user, storage):
     if c3.button("New analysis", icon=":material/add:", width="stretch", key="btn_new_final"):
         reset_analysis()
         st.rerun()
-    render_report_body(st.session_state.investigation, st.session_state.confirmed)
     render_feedback(user, storage)
 
 
