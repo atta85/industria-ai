@@ -1,0 +1,137 @@
+# Task prompts. These strings go through Python's str.format(), so {{ }} is a
+# literal brace in the JSON examples and {single} is a substituted variable.
+
+intake_task:
+  description: >
+    Analyze this industrial problem.
+
+    Industry: {industry}
+    Problem statement: {problem_statement}
+    Details the user provided (may be empty): {user_details}
+    Process data summary (may be empty): {data_summary}
+
+    1. Restate the problem in 2 to 3 plain sentences.
+    2. Suggest objectives, constraints, available data and the desired
+       outcome. Keep anything the user already provided, and only fill gaps.
+    3. List your assumptions and the important missing information.
+    4. Choose 2 to 3 specialists (4 only if process data is provided and
+       data_ai_specialist is added) from this exact list:
+       mechanical_specialist, manufacturing_specialist, electrical_specialist,
+       civil_specialist, chemical_specialist, materials_specialist,
+       biotech_specialist, software_specialist, data_ai_specialist,
+       quality_ops_specialist
+    5. Write 2 short web search queries (industry guidance, standards,
+       manufacturer notes) and 2 short academic search queries (the likely
+       mechanisms), each 3 to 8 words.
+    6. Set high_risk to true if the problem involves human safety, structural
+       failure, pressure, toxic or flammable chemicals, high voltage, medical
+       or legal matters.
+  expected_output: >
+    A JSON object only, no markdown fences, exactly this structure:
+    {{
+      "problem_summary": "2-3 plain sentences",
+      "short_title": "3 to 5 word label of the problem, e.g. Yarn breakage increase",
+      "domains": ["short domain label"],
+      "selected_specialists": ["specialist_key"],
+      "routing_rationale": "one sentence",
+      "objectives": ["..."],
+      "constraints": ["..."],
+      "available_data": ["..."],
+      "desired_outcome": "one sentence",
+      "assumptions": ["..."],
+      "missing_information": ["..."],
+      "search_queries": {{"web": ["...", "..."], "academic": ["...", "..."]}},
+      "high_risk": false,
+      "risk_note": "empty, or one sentence on the hazard"
+    }}
+
+research_task:
+  description: >
+    Problem under investigation:
+
+    {problem_context}
+
+    Search results already collected for you:
+
+    {search_results}
+
+    Select the 3 to 6 findings that matter most for this problem. For an
+    academic paper set "source_type" to "academic" and "reference_id" to the
+    exact ID in square brackets (for example W2741809807). For a web source
+    set "source_type" to "web", copy its title and URL, and leave
+    "reference_id" empty. Only use sources listed above. If an important gap
+    remains you may call one search tool once; otherwise do not call tools.
+    If the results are weak, say so in notes.
+  expected_output: >
+    A JSON object only, no markdown fences, exactly this structure:
+    {{
+      "evidence": [
+        {{"finding": "one factual sentence", "source_type": "academic or web",
+          "source_title": "...", "source_url": "...", "reference_id": "W... or empty"}}
+      ],
+      "notes": "caveats about evidence quality, or empty"
+    }}
+
+specialist_task: >
+  Analyze this problem strictly as a {specialist_role}. Other specialists
+  cover other fields.
+
+  {problem_context}
+
+  {revision_note}
+
+  The Research Agent's evidence is in your context. Give at most 3 root
+  causes, most likely first. For each, say whether it is "Evidence-based" or
+  "Agent-inference". When an academic paper in the evidence supports a point,
+  cite its reference ID in square brackets, for example [W2741809807]; never
+  invent an ID. Use safe_calculator for any arithmetic. Be concise.
+
+specialist_output: >
+  A JSON object only, no markdown fences, exactly this structure:
+  {{
+    "specialist": "{specialist_role}",
+    "root_causes": [
+      {{"cause": "short cause", "category": "People, Machine, Method, Material, Measurement or Environment",
+        "likelihood": "High, Medium or Low", "basis": "Evidence-based or Agent-inference",
+        "reasoning": "one or two sentences, with [W...] citations where used",
+        "action": "one concrete corrective action", "action_risk": "main risk of that action"}}
+    ],
+    "confidence": "low, medium or high, with a short reason"
+  }}
+
+review_task: >
+  Problem:
+
+  {problem_context}
+
+  {revision_note}
+
+  The evidence and every specialist analysis are in your context.
+
+  First challenge the work: weak evidence, shaky assumptions, contradictions
+  between specialists, missed alternative explanations, and actions that
+  could create new problems.
+
+  Then consolidate everything into ONE ranked list of 3 to 5 distinct root
+  causes (merge duplicates across specialists), most likely first. Give each
+  a likelihood percentage (0 to 100, your honest estimate), an Ishikawa
+  category, a corrective action, a priority, and a practical way to verify
+  the cause or the fix. Keep any [W...] citations from the specialists; never
+  invent one.
+review_output: >
+  A JSON object only, no markdown fences, exactly this structure:
+  {{
+    "executive_summary": "2-3 sentences: the most likely explanation and the first thing to do",
+    "verdict": "Well supported, Partly supported or Weakly supported",
+    "ranked_causes": [
+      {{"cause": "short cause", "category": "People, Machine, Method, Material, Measurement or Environment",
+        "likelihood": "High, Medium or Low", "likelihood_pct": 70,
+        "evidence": "short basis, with [W...] citations where available",
+        "action": "corrective action", "priority": "Immediate, Short-term or Long-term",
+        "verification": "how to confirm the cause or check the fix"}}
+    ],
+    "critical_findings": ["..."],
+    "alternative_explanations": ["..."],
+    "uncertainties": ["..."],
+    "risks": ["risks of the proposed actions"]
+  }}

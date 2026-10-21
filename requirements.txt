@@ -1,0 +1,8 @@
+# Industria-AI. Tested with Python 3.12/3.13 (CrewAI needs Python below 3.14).
+crewai[litellm]>=1.15,<1.16
+streamlit[auth]>=1.50,<2.0
+pandas>=2.2,<3.0
+matplotlib>=3.9,<4.0
+reportlab>=4.0,<5.0
+requests>=2.31
+pyyaml>=6.0.1
